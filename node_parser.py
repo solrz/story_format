@@ -5,8 +5,15 @@ from zipfile import ZipFile
 from os import path as pat
 from shutil import copy
 
-def not_empty(a_list):
-    return len(a_list) != 0
+extension_mp3 = '.mp3'
+extension_mp4 = '.mp4'
+extension_jpg = '.jpg'
+
+def only_one_element(a_list):
+    element_num = len(a_list)
+    if element_num > 1:
+        raise Exception("Folder have 2 or more same type src")
+    return element_num != 0
 def get_file_extension(path):
     return pat.splitext(path)[-1]
 class node:
@@ -34,7 +41,7 @@ class node:
     def add_src(self,src):
         self.src.append(src)
         
-    def get_json(self):
+    def get_dict(self):
         default_dict = {
                 "nodeid":self.id,
                 "video":"0x00",
@@ -43,12 +50,15 @@ class node:
                 "childNodeL":'',
                 "childNodeR":'',
                 }
-        video_candiate = list(filter(lambda x: x.find('.mp4') != -1,self.src))
-        audio_candiate = list(filter(lambda x: x.find('.mp3') != -1,self.src))
-        picture_candiate = list(filter(lambda x: x.find('.jpg') != -1,self.src))
-        if not_empty(video_candiate): default_dict['video'] = str(node.id).zfill(5)+'.mp4'
-        if not_empty(audio_candiate): default_dict['audio'] = str(node.id).zfill(5)+'.mp3'
-        if not_empty(picture_candiate): default_dict['pic'] = str(node.id).zfill(5)+'.jpg'
+
+        video_candiate = list(filter(lambda x: x.find(extension_mp4) != -1, self.src))
+        audio_candiate = list(filter(lambda x: x.find(extension_mp3) != -1, self.src))
+        picture_candiate = list(filter(lambda x: x.find(extension_jpg) != -1, self.src))
+
+        if only_one_element(video_candiate): default_dict['video'] = str(node.id).zfill(5) + extension_mp4
+        if only_one_element(audio_candiate): default_dict['audio'] = str(node.id).zfill(5) + extension_mp3
+        if only_one_element(picture_candiate): default_dict['pic'] = str(node.id).zfill(5) + extension_jpg
+
         if self.child[0]: default_dict['childNodeL'] = self.child[0].id
         if self.child[1]: default_dict['childNodeR'] = self.child[1].id
         # print(json.dumps(default_dict))
@@ -76,6 +86,8 @@ for path, dirs, files in os.walk(root_path,topdown=True):
             visiting_node.set_childL( node(path,dir) )
         elif not visiting_node.child[1]: 
             visiting_node.set_childR( node(path,dir) )
+        else:
+            raise Exception("Cannot set child node for parent node has full node")
         # print(pat.join(root,dir))
     for file in files:
         if file.find('.') == 0:
@@ -97,7 +109,7 @@ if True:
             src_path_output = pat.join( output_path\
                                            ,str(node.id).zfill(5)+src_extension)
             copy(src,src_path_output)
-        json_info['node'].append(node.get_json())
+        json_info['node'].append(node.get_dict())
 
 
 print(json.dumps(json_info))
