@@ -1,4 +1,4 @@
-import sys
+import sys, traceback
 import json
 import os
 from zipfile import ZipFile
@@ -12,7 +12,12 @@ extension_jpg = '.jpg'
 def only_one_element(a_list):
     element_num = len(a_list)
     if element_num > 1:
-        raise Exception("Folder have 2 or more same type src")
+        try:
+            raise Exception("Folder have 2 or more same type src")
+        except:
+            traceback.print_exc()
+            sys.exit(1)
+
     return element_num != 0
 def get_file_extension(path):
     return pat.splitext(path)[-1]
@@ -87,7 +92,11 @@ for path, dirs, files in os.walk(root_path,topdown=True):
         elif not visiting_node.child[1]: 
             visiting_node.set_childR( node(path,dir) )
         else:
-            raise Exception("Cannot set child node for parent node has full node")
+            try:
+                raise Exception("Cannot set child node, for parent node has full node")
+            except:
+                traceback.print_exc()
+                sys.exit(2)
         # print(pat.join(root,dir))
     for file in files:
         if file.find('.') == 0:
