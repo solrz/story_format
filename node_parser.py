@@ -108,8 +108,14 @@ if True:
     json_info = {"Product":"StoryBook",
                  "DataStructure":"BinaryTree",
                  "node_nums":len(node.nodes),
-                 "root_nodeid":"0000",
-                "node":[]
+                 "root_nodeid":0,
+                 "node":[],
+                 "action":[
+                    {"btn_Name": "btn_left", "action": "do_left"},
+                    {"btn_Name": "btn_right", "action": "do_right"},
+                    {"btn_Name": "btn_confirm", "action": "do_confirm"},
+                    {"btn_Name": "btn_home", "action": "do_home"},
+                 ]
             }
     for path,node in node.nodes.items():
         print(path,node.id)
